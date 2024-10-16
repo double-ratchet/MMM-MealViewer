@@ -1,0 +1,52 @@
+.MMM-MealViewer .meal-viewer {
+    font-family: var(--font-primary, "Roboto Condensed", sans-serif);
+    font-size: 0.75em;
+    line-height: 1.2;
+    text-align: left;
+    width: 100%;
+    max-width: 400px;
+}
+
+.MMM-MealViewer .module-header,
+.MMM-MealViewer .day-header {
+    font-size: var(--font-size-header, 1.125em);
+    font-family: var(--font-primary, "Roboto Condensed", sans-serif);
+    text-transform: uppercase;
+    font-weight: 400;
+    border-bottom: 1px solid var(--color-text-dimmed, #666);
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+    color: var(--color-text-dimmed, #999);
+}
+
+.MMM-MealViewer .day-header {
+    font-size: calc(var(--font-size-header, 1.125em) * 0.9);
+    margin-bottom: 10px;
+}
+
+.MMM-MealViewer .school-logo {
+    width: 30px;
+    height: auto;
+    margin-right: 10px;
+    vertical-align: bottom;
+}
+
+.MMM-MealViewer .day-menu {
+    margin-bottom: 20px;
+}
+
+.MMM-MealViewer .meal-line {
+    margin: 5px 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+.MMM-MealViewer .meal-line + .meal-line {
+    margin-top: 10px;
+}
+
+.MMM-MealViewer .meal-type {
+    font-weight: bold;
+    color: var(--color-text-bright, #fff);
+}
