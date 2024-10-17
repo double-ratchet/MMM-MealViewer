@@ -2,7 +2,7 @@
 
 A MagicMirror module for displaying school breakfast and lunch menus from MealViewer. You can check to see if your school uses MealViewer [here](https://schools.mealviewer.com/).
 
-- [Screenshot](#screenshot)
+- [Screenshots](#screenshots)
 - [Installation](#installation)
 - [Configuration](#configuration)
     - [Required Configuration](#required-configuration)
@@ -13,7 +13,13 @@ A MagicMirror module for displaying school breakfast and lunch menus from MealVi
 
 ## Screenshot
 
+Single instance:
+
 <img src="screenshots/single-instance.png" />
+
+Multiple instances:
+
+<img src="screenshots/multiple-instance.png" />
 
 ## Installation
 
@@ -23,7 +29,7 @@ A MagicMirror module for displaying school breakfast and lunch menus from MealVi
 
 2\. Clone this repository:
 
-`git clone https://github.com/dadAndEl/MMM-MealViewer.git`
+`git clone https://github.com/ElliAndDad/MMM-MealViewer.git`
 
 3\. Install dependencies:
 
