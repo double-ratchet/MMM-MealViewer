@@ -1,6 +1,6 @@
 # MMM-MealViewer
 
-A MagicMirror module for displaying school breakfast and lunch menus from MealViewer. You can check to see if your school uses MealViewer [here](https://schools.mealviewer.com/).
+A MagicMirror module for displaying school breakfast and lunch menus from MealViewer. You can check to see if your school uses MealViewer [here](https://schools.mealviewer.com/). **Note - if there are no valid menus for the current week (ie- school is out) the module will not display.*
 
 - [Screenshots](#screenshots)
 - [Installation](#installation)
