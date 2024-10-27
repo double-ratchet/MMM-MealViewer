@@ -16,26 +16,55 @@ module.exports = NodeHelper.create({
     },
 
     getMealData: async function (payload) {
-        const { identifier, schoolId, filters, itemTypeFilters, exactNameFilters, startsWithFilters, startDay, endDay, showPastDays, hideTodayAfter, showBreakfast, showLunch } = payload;
+        const {
+            identifier,
+            schoolId,
+            filters,
+            itemTypeFilters,
+            exactNameFilters,
+            startsWithFilters,
+            startDay,
+            endDay,
+            showPastDays,
+            hideTodayAfter,
+            showBreakfast,
+            showLunch,
+            testMode,
+            testDate
+        } = payload;
 
         if (this.fetchingData[identifier]) {
             return;
         }
 
         this.fetchingData[identifier] = true;
-        const dateRange = this.getDateRange(startDay, endDay);
+        const dateRange = this.getDateRange(startDay, endDay, testMode, testDate);
         const url = `https://api.mealviewer.com/api/v4/school/${schoolId}/${dateRange.start}/${dateRange.end}/`;
 
+        console.log(`Test mode: ${testMode}, Test date: ${testDate}`);
         console.log(`Requesting data from URL: ${url}`);
         console.log(`Date range: ${dateRange.start} to ${dateRange.end}`);
 
         try {
             const response = await axios.get(url);
             console.log("API Response status:", response.status);
-
             // this.writeDataToFile(response.data, "rawMealData.json");
-            const mealData = this.parseMealData(response.data, filters, itemTypeFilters, exactNameFilters, startsWithFilters, showPastDays, hideTodayAfter, showBreakfast, showLunch);
+
+            const mealData = this.parseMealData(
+                response.data,
+                filters,
+                itemTypeFilters,
+                exactNameFilters,
+                startsWithFilters,
+                showPastDays,
+                hideTodayAfter,
+                showBreakfast,
+                showLunch,
+                testMode,
+                testDate
+            );
             // this.writeDataToFile(mealData, "parsedMealData.json");
+
             const schoolLogo = `https://custcdn.mealviewer.com/schoollogo/${response.data.physicalLocation?.schoolSettings?.schoolLogo}`;
             const schoolName = response.data.physicalLocation?.name || "School";
             this.sendSocketNotification("MEAL_DATA", {
@@ -52,7 +81,6 @@ module.exports = NodeHelper.create({
                 console.error("Error response status:", error.response.status);
                 console.error("Error response headers:", error.response.headers);
             }
-            // Send a notification even if there's an error
             this.sendSocketNotification("MEAL_DATA", {
                 identifier: identifier,
                 mealData: [],
@@ -65,23 +93,35 @@ module.exports = NodeHelper.create({
         }
     },
 
-    getDateRange: function (startDay, endDay) {
-        const today = new Date();
-        const currentDay = today.getDay();
+    getDateRange: function (startDay, endDay, testMode = false, testDate = null) {
+        let today;
 
-        // Calculate the date of this week's start day
-        const startDate = new Date(today);
-        startDate.setDate(today.getDate() - currentDay + startDay);
-
-        // If start day is after today, go back one week
-        if (startDate > today) {
-            startDate.setDate(startDate.getDate() - 7);
+        if (testMode && testDate) {
+            const [year, month, day] = testDate.split('-').map(Number);
+            today = new Date(year, month - 1, day);
+            console.log(`Using test date (local timezone): ${today.toLocaleString()}`);
+        } else {
+            today = new Date();
         }
+
+        const currentDay = today.getDay();
+        console.log(`Current day of week: ${currentDay}`);
+
+        // Calculate the date for the week's start
+        const startDate = new Date(today);
+        const daysToSubtract = ((currentDay - startDay + 7) % 7);
+        startDate.setDate(today.getDate() - daysToSubtract);
+
+        console.log(`Days to subtract: ${daysToSubtract}`);
+        console.log(`Initial start date: ${startDate.toLocaleString()}`);
 
         // Calculate the end date
         const endDate = new Date(startDate);
         const daysInRange = (endDay - startDay + 7) % 7 + 1;
         endDate.setDate(startDate.getDate() + daysInRange - 1);
+
+        console.log(`Final start date: ${startDate.toLocaleString()}`);
+        console.log(`Final end date: ${endDate.toLocaleString()}`);
 
         const formatDate = (date) => {
             const year = date.getFullYear();
@@ -96,11 +136,20 @@ module.exports = NodeHelper.create({
         };
     },
 
-    parseMealData: function (jsonData, filters, itemTypeFilters, exactNameFilters, startsWithFilters, showPastDays, hideTodayAfter, showBreakfast, showLunch) {
+    parseMealData: function (jsonData, filters, itemTypeFilters, exactNameFilters, startsWithFilters, showPastDays, hideTodayAfter, showBreakfast, showLunch, testMode = false, testDate = null) {
         const mealData = [];
         const menuSchedules = jsonData.menuSchedules;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Set to beginning of the day for accurate comparison
+
+        let today;
+        if (testMode && testDate) {
+            const [year, month, day] = testDate.split('-').map(Number);
+            today = new Date(year, month - 1, day);
+            console.log(`Using test date in parseMealData (local timezone): ${today.toLocaleString()}`);
+        } else {
+            today = new Date();
+        }
+        today.setHours(0, 0, 0, 0);
+
         let hideHour, hideMinute;
 
         if (hideTodayAfter.toLowerCase() !== "never") {
@@ -109,7 +158,7 @@ module.exports = NodeHelper.create({
 
         menuSchedules.forEach(schedule => {
             const date = new Date(schedule.dateInformation.dateFull);
-            date.setHours(0, 0, 0, 0); // Set to beginning of the day for accurate comparison
+            date.setHours(0, 0, 0, 0);
             const formattedDate = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
             console.log(`Processing date: ${formattedDate}, Today: ${today.toDateString()}`);

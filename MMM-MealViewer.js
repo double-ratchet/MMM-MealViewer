@@ -2,12 +2,14 @@ Module.register("MMM-MealViewer", {
     defaults: {
         schoolId: "",
         updateInterval: 14400000,
-        startDay: 1,
+        startDay: 0,
         endDay: 5,
         showPastDays: false,
         hideTodayAfter: "14:00",
         showBreakfast: true,
         showLunch: true,
+        testMode: false,
+        testDate: null, // Format: "YYYY-MM-DD"
         filters: {
             breakfast: [],
             lunch: []
@@ -49,7 +51,9 @@ Module.register("MMM-MealViewer", {
             showPastDays: this.config.showPastDays,
             hideTodayAfter: this.config.hideTodayAfter,
             showBreakfast: this.config.showBreakfast,
-            showLunch: this.config.showLunch
+            showLunch: this.config.showLunch,
+            testMode: this.config.testMode,
+            testDate: this.config.testDate
         });
     },
 
