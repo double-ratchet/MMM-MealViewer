@@ -78,7 +78,7 @@ Add the following to your `config.js` file:
 
 `schoolId`
 
-- To find your school ID go to [MealViewer](https://schools.mealviewer.com/), search for your school and click on it.
+- To find your school ID go to <a href="https://schools.mealviewer.com/" target="_blank">MealViewer</a>, search for your school and click on it.
 
 - The url will look like `https://schools.mealviewer.com/school/YourSchoolID`
 
