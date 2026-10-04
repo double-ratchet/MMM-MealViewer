@@ -205,7 +205,7 @@ Set a maximum number of days to display.
 
 9\. `customSchoolName`
 
-- Name to show in the header in place of the school name from MealViewer, which isn't always the name you'd use. "Menu" is still added after it.
+- Override the school name shown in the header. "Menu" is added after it.
 - Default: null (use the name from MealViewer)
 
 *Example*

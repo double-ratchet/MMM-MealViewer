@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Custom School Name**: New `customSchoolName` option to override the school name shown in the header
 
+### Changed
+- **Single-line Header**: The school name shrinks to fit so the header stays on one line
+
 ## [1.1.0] - 2026-01-29
 
 ### Added

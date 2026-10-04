@@ -1,7 +1,7 @@
 Module.register("MMM-MealViewer", {
     defaults: {
         schoolId: "",
-        customSchoolName: null, // Name to show in the header instead of the one from MealViewer
+        customSchoolName: null, // Set to override the school name from MealViewer
         updateInterval: 14400000, // 4 hours, adjust as needed
         showTodayOnly: false, // set to true if you want to see only today
         startDay: 0, // 0 = Sunday, 1 = Monday, ..., 6 = Saturday (Ignored if showTodayOnly = true)
@@ -94,13 +94,74 @@ Module.register("MMM-MealViewer", {
         }
     },
 
-    // customSchoolName wins when it's a non-blank string; otherwise use the name from MealViewer
+    // Use customSchoolName if it's set, otherwise the name from MealViewer
     getSchoolName: function () {
         const custom = this.config.customSchoolName;
         if (typeof custom === "string" && custom.trim() !== "") {
             return custom.trim();
         }
         return this.schoolName;
+    },
+
+    // Shrink the title so the header fits on one line. Stops at MIN_SCALE, CSS adds an ellipsis after that
+    fitHeaderTitle: function (header, title) {
+        const MIN_SCALE = 0.5;
+        // Leave a couple px so fractional widths don't trigger the ellipsis
+        const SLACK = 2;
+        title.style.fontSize = "";
+        if (header.clientWidth === 0) {
+            return;
+        }
+        // Logo + margin
+        let otherWidth = 0;
+        for (const child of header.children) {
+            if (child !== title) {
+                const style = getComputedStyle(child);
+                otherWidth += child.getBoundingClientRect().width + parseFloat(style.marginLeft) + parseFloat(style.marginRight);
+            }
+        }
+        const room = header.clientWidth - otherWidth - SLACK;
+        const width = title.getBoundingClientRect().width;
+        if (width <= room) {
+            return;
+        }
+        let scale = Math.max(MIN_SCALE, room / width);
+        title.style.fontSize = `${scale}em`;
+        // Step down a bit more if rounding left it slightly too wide
+        while (title.getBoundingClientRect().width > room && scale > MIN_SCALE) {
+            scale = Math.max(MIN_SCALE, scale - 0.02);
+            title.style.fontSize = `${scale}em`;
+        }
+    },
+
+    // Refit when the header width changes (other modules can resize the region) and after fonts load
+    watchHeaderTitle: function (header, title) {
+        if (this.headerObserver) {
+            this.headerObserver.disconnect();
+            this.headerObserver = null;
+        }
+        if (typeof ResizeObserver === "undefined") {
+            requestAnimationFrame(() => this.fitHeaderTitle(header, title));
+            return;
+        }
+        let lastWidth = null;
+        this.headerObserver = new ResizeObserver((entries) => {
+            const width = entries[0].contentRect.width;
+            // Only width changes need a refit
+            if (width === lastWidth) {
+                return;
+            }
+            lastWidth = width;
+            this.fitHeaderTitle(header, title);
+        });
+        this.headerObserver.observe(header);
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(() => {
+                if (header.isConnected) {
+                    this.fitHeaderTitle(header, title);
+                }
+            });
+        }
     },
 
     getDom: function () {
@@ -125,11 +186,13 @@ Module.register("MMM-MealViewer", {
         }
 
         const title = document.createElement("span");
+        title.className = "school-name";
         const schoolName = this.getSchoolName();
         title.textContent = schoolName
             ? `${schoolName} Menu`
             : "School Menu";
         header.appendChild(title);
+        this.watchHeaderTitle(header, title);
 
         menu.appendChild(header);
 

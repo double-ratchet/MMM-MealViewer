@@ -40,6 +40,10 @@
     margin-bottom: 15px;
     color: var(--color-text-dimmed, #999);
     line-height: 1.5;
+    /* Keep the header on one line, the title gets shrunk to fit in fitHeaderTitle() */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .MMM-MealViewer .day-header {
