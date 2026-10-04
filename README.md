@@ -67,6 +67,7 @@ Add the following to your `config.js` file:
     position: "top_left",
     config: {
         schoolId: "YourSchoolId",
+        customSchoolName: null, // Set to override the school name shown in the header
         updateInterval: 14400000, // 4 hours, adjust as needed
         showTodayOnly: false, // set to true if you want to see only today
         startDay: 0, // 0 = Sunday, 1 = Monday, ..., 6 = Saturday (Ignored if showTodayOnly = true)
@@ -200,6 +201,16 @@ Set a maximum number of days to display.
 *Example*
 ```javascript
      lookAhead: true, // Enable automatic look-ahead to next week
+```
+
+9\. `customSchoolName`
+
+- Name to show in the header in place of the school name from MealViewer, which isn't always the name you'd use. "Menu" is still added after it.
+- Default: null (use the name from MealViewer)
+
+*Example*
+```javascript
+     customSchoolName: "Sutton Middle School", // Header reads "Sutton Middle School Menu"
 ```
 
 ## Filters

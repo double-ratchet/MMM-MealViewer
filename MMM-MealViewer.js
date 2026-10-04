@@ -1,6 +1,7 @@
 Module.register("MMM-MealViewer", {
     defaults: {
         schoolId: "",
+        customSchoolName: null, // Name to show in the header instead of the one from MealViewer
         updateInterval: 14400000, // 4 hours, adjust as needed
         showTodayOnly: false, // set to true if you want to see only today
         startDay: 0, // 0 = Sunday, 1 = Monday, ..., 6 = Saturday (Ignored if showTodayOnly = true)
@@ -93,6 +94,15 @@ Module.register("MMM-MealViewer", {
         }
     },
 
+    // customSchoolName wins when it's a non-blank string; otherwise use the name from MealViewer
+    getSchoolName: function () {
+        const custom = this.config.customSchoolName;
+        if (typeof custom === "string" && custom.trim() !== "") {
+            return custom.trim();
+        }
+        return this.schoolName;
+    },
+
     getDom: function () {
         var wrapper = document.createElement("div");
         wrapper.className = "meal-viewer";
@@ -115,8 +125,9 @@ Module.register("MMM-MealViewer", {
         }
 
         const title = document.createElement("span");
-        title.textContent = this.schoolName
-            ? `${this.schoolName} Menu`
+        const schoolName = this.getSchoolName();
+        title.textContent = schoolName
+            ? `${schoolName} Menu`
             : "School Menu";
         header.appendChild(title);
 
